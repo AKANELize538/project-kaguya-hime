@@ -12,7 +12,11 @@ html, body {
 #app {
   position: relative;
   width: 100vw;
+  /* dvh = dynamic viewport height: updates when the browser chrome
+     shows/hides, preventing the Android overflow where 100vh > innerHeight.
+     100vh is the fallback for older browsers that don't support dvh. */
   height: 100vh;
+  height: 100dvh;
 }
 
 #stage {
@@ -30,9 +34,7 @@ html, body {
   flex-direction: column;
   justify-content: space-between;
   pointer-events: none;
-  /* Extra bottom padding lifts the mic/settings controls above the Android
-     navigation bar so they aren't clipped at the screen edge. */
-  padding: 20px 20px 100px;
+  padding: 20px;
 }
 
 #overlay > * {
@@ -120,11 +122,20 @@ header h1 span {
   line-height: 1.5;
 }
 
+/* Fixed to the visual viewport so buttons are always reachable regardless of
+   100vh overflow, browser chrome, or flex-layout height miscalculations.
+   80px from bottom clears the Android nav bar (~55px) with room to spare. */
 #controls {
+  position: fixed;
+  bottom: 80px;
+  left: 0;
+  right: 0;
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 16px;
+  pointer-events: auto;
+  z-index: 100;
 }
 
 #mic-btn, #settings-btn {

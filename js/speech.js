@@ -103,6 +103,15 @@ export class SpeechController {
     if (window.speechSynthesis) {
       speechSynthesis.onvoiceschanged = () => {};
     }
+
+    // When audio devices change — e.g. the Galaxy Buds connect or disconnect —
+    // forget that we primed the mic, so the next listen re-engages whatever is
+    // now the system default input (the Buds, if they just connected).
+    if (navigator.mediaDevices) {
+      navigator.mediaDevices.addEventListener?.('devicechange', () => {
+        this._micPrimed = false;
+      });
+    }
   }
 
   setLanguage(key) {
@@ -154,6 +163,20 @@ export class SpeechController {
   // immediately because SpeechRecognition opens its own capture session.
   async _ensureMicPermission() {
     if (this._micPrimed) return;
+    // If permission is already granted, DON'T re-open the mic here. On a
+    // Bluetooth headset (e.g. Galaxy Buds 2) opening getUserMedia forces an
+    // extra A2DP(music) <-> SCO(call) profile switch; doing it twice in a row
+    // (prime, then SpeechRecognition) adds a stutter. When already granted, let
+    // SpeechRecognition open the current default input device directly.
+    try {
+      const status = await navigator.permissions?.query({ name: 'microphone' });
+      if (status?.state === 'granted') {
+        this._micPrimed = true;
+        return;
+      }
+    } catch {
+      // Some browsers don't support querying 'microphone' — fall through.
+    }
     if (!navigator.mediaDevices?.getUserMedia) {
       // Old browser without mediaDevices — let SpeechRecognition prompt itself.
       this._micPrimed = true;

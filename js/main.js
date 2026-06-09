@@ -18,12 +18,16 @@ const speech = new SpeechController({
   onListenChange: (listening) => micBtn.classList.toggle('listening', listening),
   onSpeakChange: (talking) => stage.setTalking(talking),
   onError: (err) => {
-    if (err === 'not-allowed' || err === 'service-not-allowed') {
-      userLine.textContent = '🎤 마이크 권한이 필요해요. 브라우저 설정에서 허용해주세요.';
-    } else if (err === 'no-device') {
-      userLine.textContent =
-        '🎤 마이크를 찾지 못했어요. 태블릿에 마이크(또는 블루투스 마이크)를 연결하고 시스템 기본 입력으로 설정해주세요.';
-    }
+    const messages = {
+      'not-allowed': '🎤 마이크 권한이 필요해요. 브라우저 설정에서 허용해주세요.',
+      'service-not-allowed': '🎤 마이크 권한이 필요해요. 브라우저 설정에서 허용해주세요.',
+      'no-device': '🎤 마이크를 찾지 못했어요. Galaxy Buds가 연결돼 시스템 기본 입력으로 잡혔는지 확인해주세요.',
+      'audio-capture': '🎤 마이크 소리를 못 잡았어요. Buds가 통화/미디어 오디오로 연결됐는지, 다른 앱이 마이크를 쓰고 있지 않은지 확인해주세요.',
+      'no-speech': '🤔 소리를 못 들었어요. Buds 마이크에 또렷하게 다시 말해줘요.',
+      network: '🌐 음성인식 서버에 연결하지 못했어요. 인터넷 연결을 확인해주세요.',
+    };
+    const msg = messages[err];
+    if (msg) userLine.textContent = msg;
   },
 });
 speech.setLanguage(currentLang);

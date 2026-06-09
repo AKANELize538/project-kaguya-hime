@@ -95,6 +95,14 @@ header h1 span {
   padding: 14px 18px;
   backdrop-filter: blur(8px);
   text-align: center;
+  transition: opacity 0.25s ease;
+}
+
+/* Hide the caption bubble while there's nothing to show, so it doesn't cover
+   the avatar. It fades back in as soon as a line of text is set. */
+#caption:has(#user-line:empty):has(#ai-line:empty) {
+  opacity: 0;
+  pointer-events: none;
 }
 
 #user-line {

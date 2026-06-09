@@ -7,12 +7,12 @@ name: Deploy Newrosama to GitHub Pages
 # ONE-TIME SETUP (do this once in the GitHub web UI):
 #   Repo → Settings → Pages → "Build and deployment" → Source: GitHub Actions
 # After that, every push here auto-publishes to:
-#   https://<your-username>.github.io/melon-ticket-timer/
+#   https://<your-username>.github.io/project-kaguya-hime/
 
 on:
   push:
     branches:
-      - claude/newrosama-3d-ai-character-nLNed
+      - main
   workflow_dispatch: {}
 
 permissions:

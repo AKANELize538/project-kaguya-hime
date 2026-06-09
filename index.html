@@ -13,7 +13,7 @@
     worker-src 'self' blob:;
   ">
   <title>Newrosama — Project Kaguya</title>
-  <link rel="stylesheet" href="css/style.css?v=9">
+  <link rel="stylesheet" href="css/style.css?v=10">
 </head>
 <body>
   <div id="app">
@@ -22,11 +22,17 @@
     <div id="overlay">
       <header>
         <h1>Newrosama<span>PROJECT KAGUYA</span></h1>
-        <div id="lang-switch">
-          <button data-lang="ko">한국어</button>
-          <button data-lang="ja">日本語</button>
-          <button data-lang="en">English</button>
-          <button data-lang="multi" class="active">EN+JA</button>
+        <div id="header-right">
+          <div id="lang-switch">
+            <button data-lang="ko">한국어</button>
+            <button data-lang="ja">日本語</button>
+            <button data-lang="en">English</button>
+            <button data-lang="multi" class="active">EN+JA</button>
+          </div>
+          <div id="top-controls">
+            <button id="settings-btn" title="설정 (아바타 / AI 연결)">⚙</button>
+            <button id="fullscreen-btn" title="전체화면">⛶</button>
+          </div>
         </div>
       </header>
 
@@ -36,9 +42,7 @@
       </div>
 
       <div id="controls">
-        <button id="settings-btn" title="설정 (아바타 / AI 연결)">⚙</button>
         <button id="mic-btn" title="눌러서 말하기">🎤</button>
-        <button id="fullscreen-btn" title="전체화면">⛶</button>
       </div>
     </div>
 
@@ -172,6 +176,6 @@
   <script src="https://cubism.live2d.com/sdk-web/cubismcore/live2dcubismcore.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/pixi-live2d-display@0.4.0/dist/cubism4.min.js"></script>
 
-  <script type="module" src="js/main.js?v=9"></script>
+  <script type="module" src="js/main.js?v=10"></script>
 </body>
 </html>

@@ -16,10 +16,41 @@ const langButtons = [...document.querySelectorAll('#lang-switch button')];
 
 let currentLang = CONFIG.defaultLang || 'ja'; // Newrosama speaks Japanese by default
 
+// Always-on mic: after each recognized phrase or silence timeout, listening
+// restarts automatically — no tap needed. While Newrosama is speaking the
+// reply we wait for onSpeakChange(false) before restarting so the mic
+// doesn't pick up her own TTS. micAutoMode is turned off by a manual mic
+// tap or by an unrecoverable error, and back on by tapping the mic again.
+let micAutoMode = true;
+let gotResult = false;
+
+function restartListeningSoon() {
+  if (!micAutoMode) return;
+  setTimeout(() => {
+    if (!micAutoMode || micBtn.classList.contains('listening')) return;
+    speech.startListening();
+  }, 400);
+}
+
 const speech = new SpeechController({
-  onResult: handleUserSpeech,
-  onListenChange: (listening) => micBtn.classList.toggle('listening', listening),
-  onSpeakChange: (talking) => stage.setTalking(talking),
+  onResult: (text) => {
+    gotResult = true;
+    handleUserSpeech(text);
+  },
+  onListenChange: (listening) => {
+    micBtn.classList.toggle('listening', listening);
+    if (!listening) {
+      if (gotResult) {
+        gotResult = false; // wait for the TTS reply to finish before restarting
+      } else {
+        restartListeningSoon();
+      }
+    }
+  },
+  onSpeakChange: (talking) => {
+    stage.setTalking(talking);
+    if (!talking) restartListeningSoon();
+  },
   onError: (err) => {
     const messages = {
       'not-allowed': '🎤 마이크 권한이 필요해요. 브라우저 설정에서 허용해주세요.',
@@ -31,6 +62,12 @@ const speech = new SpeechController({
     };
     const msg = messages[err];
     if (msg) userLine.textContent = msg;
+    // These errors won't resolve on their own — stop auto-restarting so we
+    // don't spam getUserMedia/recognition in a loop. Tapping the mic button
+    // re-enables auto mode and retries.
+    if (['not-allowed', 'service-not-allowed', 'no-device', 'audio-capture', 'network'].includes(err)) {
+      micAutoMode = false;
+    }
   },
 });
 speech.setLanguage(currentLang);
@@ -55,12 +92,19 @@ langButtons.forEach((btn) => {
 
 micBtn.addEventListener('click', () => {
   if (micBtn.classList.contains('listening')) {
+    micAutoMode = false;
     speech.stopListening();
     return;
   }
+  micAutoMode = true;
   userLine.textContent = '';
   speech.startListening();
 });
+
+// Start listening as soon as the page loads — no tap required.
+if (speech.supported) {
+  speech.startListening();
+}
 
 async function handleUserSpeech(text) {
   userLine.textContent = `🗣️ ${text}`;

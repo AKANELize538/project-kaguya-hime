@@ -101,7 +101,7 @@ export class Brain {
         body: JSON.stringify({
           model: this.model || SUGGESTED_PRESETS.groq.model,
           temperature: 0.7,
-          max_tokens: 100,   // ~1-2 sentences keeps latency minimal on 70B
+          max_tokens: 450,   // ~3-5 sentences, balances answer depth and latency
           messages: [
             { role: 'system', content: SYSTEM_PROMPT },
             ...this.history.slice(-6), // 6 turns of context = fast + coherent

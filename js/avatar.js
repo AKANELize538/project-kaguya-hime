@@ -22,8 +22,8 @@ export class AvatarStage {
 
     this.app = new PIXI.Application({
       view: canvas,
-      width: canvas.clientWidth || window.innerWidth,
-      height: canvas.clientHeight || window.innerHeight,
+      width: window.innerWidth,
+      height: window.innerHeight,
       backgroundColor: 0x171225,
       antialias: true,
       resolution: Math.min(window.devicePixelRatio, 2),
@@ -35,8 +35,8 @@ export class AvatarStage {
     this._drawPlaceholder();
 
     window.addEventListener('resize', () => {
-      const w = this.canvas.clientWidth || window.innerWidth;
-      const h = this.canvas.clientHeight || window.innerHeight;
+      const w = window.innerWidth;
+      const h = window.innerHeight;
       this.app.renderer.resize(w, h);
       if (this.live2dModel) this._fitModel(this.live2dModel);
       this._drawPlaceholder();
@@ -148,19 +148,18 @@ export class AvatarStage {
   }
 
   _fitModel(model) {
-    // Use the LOGICAL screen size (CSS px), not renderer.width/height which are
-    // physical px (= logical × resolution). On high-DPR devices like the Galaxy
-    // Tab S11 (devicePixelRatio 2) the stage coordinate space is in logical px,
-    // so mixing in physical px scaled the model ~2× and clipped it off-screen.
+    // renderer.screen gives logical CSS px (not physical px × DPR).
     const w = this.app.renderer.screen.width;
     const h = this.app.renderer.screen.height;
     const origW = model.internalModel?.originalWidth ?? model.width;
     const origH = model.internalModel?.originalHeight ?? model.height;
-    // Leave a little headroom so the whole body (incl. broom) fits on screen.
     const scale = Math.min((w * 0.9) / origW, (h * 0.92) / origH);
     model.scale.set(scale);
-    model.x = (w - model.width) / 2;
-    model.y = (h - model.height) / 2;
+    // anchor(0.5,0.5) sets pivot to canvas center so model.x/y places the
+    // canvas center — not its top-left — at the given world coordinate.
+    model.anchor.set(0.5, 0.5);
+    model.x = w / 2;
+    model.y = h / 2;
   }
 
   _drawPlaceholder() {

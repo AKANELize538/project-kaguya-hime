@@ -73,6 +73,20 @@ const settingsBtn = document.getElementById('settings-btn');
 const settingsDialog = document.getElementById('settings');
 const closeSettingsBtn = document.getElementById('close-settings');
 
+// Fullscreen toggle (Android Chrome hides address bar + nav bar)
+const fullscreenBtn = document.getElementById('fullscreen-btn');
+fullscreenBtn.addEventListener('click', () => {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen?.().catch(() => {});
+  } else {
+    document.exitFullscreen?.();
+  }
+});
+document.addEventListener('fullscreenchange', () => {
+  fullscreenBtn.title = document.fullscreenElement ? '전체화면 해제' : '전체화면';
+  fullscreenBtn.textContent = document.fullscreenElement ? '✕' : '⛶';
+});
+
 const modelFileInput = document.getElementById('model-file');
 const modelUrlInput = document.getElementById('model-url');
 const loadModelBtn = document.getElementById('load-model');

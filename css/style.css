@@ -155,14 +155,14 @@ header h1 span {
   cursor: not-allowed;
 }
 
-#settings-btn {
+#settings-btn, #fullscreen-btn {
   width: 44px;
   height: 44px;
   font-size: 18px;
   background: rgba(255,255,255,0.08);
   color: #d8cdf2;
 }
-#settings-btn:hover { background: rgba(255,255,255,0.16); }
+#settings-btn:hover, #fullscreen-btn:hover { background: rgba(255,255,255,0.16); }
 
 @keyframes pulse {
   0% { box-shadow: 0 0 0 0 rgba(255, 95, 126, 0.55); }

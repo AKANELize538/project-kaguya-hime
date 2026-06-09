@@ -32,7 +32,7 @@ html, body {
   pointer-events: none;
   /* Extra bottom padding lifts the mic/settings controls above the Android
      navigation bar so they aren't clipped at the screen edge. */
-  padding: 20px 20px 56px;
+  padding: 20px 20px 100px;
 }
 
 #overlay > * {

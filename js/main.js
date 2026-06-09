@@ -1,10 +1,10 @@
 // ?v= query busts the browser/CDN module cache on each release. Bump it
 // whenever any js/ file changes so tablets fetch the new code immediately
 // instead of serving a stale ES module from cache.
-import { AvatarStage } from './avatar.js?v=3';
-import { SpeechController } from './speech.js?v=3';
-import { Brain } from './brain.js?v=3';
-import { CONFIG } from './config.js?v=3';
+import { AvatarStage } from './avatar.js?v=4';
+import { SpeechController } from './speech.js?v=4';
+import { Brain } from './brain.js?v=4';
+import { CONFIG } from './config.js?v=4';
 
 const stage = new AvatarStage(document.getElementById('stage'));
 const brain = new Brain();
@@ -78,16 +78,28 @@ const closeSettingsBtn = document.getElementById('close-settings');
 
 // Fullscreen toggle (Android Chrome hides address bar + nav bar)
 const fullscreenBtn = document.getElementById('fullscreen-btn');
-fullscreenBtn.addEventListener('click', () => {
+function toggleFullscreen() {
   if (!document.fullscreenElement) {
     document.documentElement.requestFullscreen?.().catch(() => {});
   } else {
     document.exitFullscreen?.();
   }
-});
+}
+fullscreenBtn.addEventListener('click', toggleFullscreen);
 document.addEventListener('fullscreenchange', () => {
   fullscreenBtn.title = document.fullscreenElement ? '전체화면 해제' : '전체화면';
   fullscreenBtn.textContent = document.fullscreenElement ? '✕' : '⛶';
+});
+
+// Press "F" to toggle fullscreen — but not while typing in the settings inputs.
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'f' && e.key !== 'F') return;
+  if (e.ctrlKey || e.metaKey || e.altKey) return; // leave browser shortcuts alone
+  const el = document.activeElement;
+  const typing = el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT');
+  if (typing || settingsDialog.open) return;
+  e.preventDefault();
+  toggleFullscreen();
 });
 
 const modelFileInput = document.getElementById('model-file');

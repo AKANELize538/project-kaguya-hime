@@ -22,8 +22,8 @@ export const CONFIG = {
   // so you don't have to pick a folder by hand on the device).
   autoLoadModel: true,
 
-  // Default spoken language: 'ja' | 'ko' | 'en'
-  defaultLang: 'ja',
+  // Default spoken language: 'ja' | 'ko' | 'en' | 'multi' (EN+JA mixed)
+  defaultLang: 'multi',
 
   // Voice defaults. mode: 'web' (tablet-friendly Himari) | 'local' | 'off'
   voicevox: {

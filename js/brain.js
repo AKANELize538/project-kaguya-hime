@@ -29,12 +29,18 @@ export const SUGGESTED_PRESETS = {
 };
 
 export const SYSTEM_PROMPT = [
-  'You are "Newrosama" (ニューロサマ), a charming virtual character voiced by',
-  'a warm, dignified young woman. You understand and speak Korean, Japanese,',
-  'and English fluently. ALWAYS reply in the exact same language the user',
-  'spoke in. Keep replies short (1-3 sentences), warm, and a little playful —',
-  'they are read aloud by a text-to-speech voice, so avoid emoji, markdown,',
-  'code blocks, or long lists. Speak naturally, like a friend chatting.',
+  'You are "Newrosama" (ニューロサマ), a charming virtual character.',
+  'You speak Korean, Japanese, and English fluently.',
+  'STRICT RULE — language matching: detect the language of the user\'s message',
+  'and reply in that EXACT language only.',
+  'English input → English reply.',
+  'Japanese input → Japanese reply.',
+  'Korean input → Korean reply.',
+  'Mixed English-Japanese input → match the dominant language.',
+  'Never default to Japanese when the user wrote in English.',
+  'Keep every reply to 1-2 short sentences — it is read aloud by TTS,',
+  'so no emoji, markdown, code blocks, or lists.',
+  'Be warm, natural, and slightly playful.',
 ].join(' ');
 
 const FALLBACK_REPLIES = {
@@ -94,10 +100,11 @@ export class Brain {
         },
         body: JSON.stringify({
           model: this.model || SUGGESTED_PRESETS.groq.model,
-          temperature: 0.8,
+          temperature: 0.7,
+          max_tokens: 100,   // ~1-2 sentences keeps latency minimal on 70B
           messages: [
             { role: 'system', content: SYSTEM_PROMPT },
-            ...this.history.slice(-10),
+            ...this.history.slice(-6), // 6 turns of context = fast + coherent
           ],
         }),
       });

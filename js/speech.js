@@ -9,9 +9,12 @@
 // STT uses the browser's SpeechRecognition API (Chrome / Edge only).
 
 export const LANGUAGES = {
-  ko: { code: 'ko-KR', label: '한국어' },
-  ja: { code: 'ja-JP', label: '日本語' },
-  en: { code: 'en-US', label: 'English' },
+  ko:    { code: 'ko-KR', label: '한국어' },
+  ja:    { code: 'ja-JP', label: '日本語' },
+  en:    { code: 'en-US', label: 'English' },
+  // Mixed English-Japanese: ja-JP engine handles EN/JA code-switching well.
+  // The brain detects the dominant language and replies accordingly.
+  multi: { code: 'ja-JP', label: 'EN+JA' },
 };
 
 export const VOICE_PERSONAS = {

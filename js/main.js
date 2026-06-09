@@ -20,6 +20,9 @@ const speech = new SpeechController({
   onError: (err) => {
     if (err === 'not-allowed' || err === 'service-not-allowed') {
       userLine.textContent = '🎤 마이크 권한이 필요해요. 브라우저 설정에서 허용해주세요.';
+    } else if (err === 'no-device') {
+      userLine.textContent =
+        '🎤 마이크를 찾지 못했어요. 태블릿에 마이크(또는 블루투스 마이크)를 연결하고 시스템 기본 입력으로 설정해주세요.';
     }
   },
 });

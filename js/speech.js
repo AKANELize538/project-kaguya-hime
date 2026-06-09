@@ -130,10 +130,48 @@ export class SpeechController {
     if (!this.recognition) return;
     speechSynthesis?.cancel();
     this.recognition.lang = LANGUAGES[this.lang].code;
+    // Prime mic permission and engage the system's current default input device
+    // (built-in, USB, or a paired Bluetooth headset) before starting. The Web
+    // Speech API always captures from the OS default input — it has no way to
+    // target a specific device — so a Bluetooth mic works as long as the tablet
+    // has it selected as the default recording device. This getUserMedia call
+    // just makes the permission prompt appear reliably and wakes that device up.
+    this._ensureMicPermission()
+      .then(() => {
+        try {
+          this.recognition.start();
+        } catch {
+          // already running — ignore
+        }
+      })
+      .catch(() => {
+        // permission denied / no device — already reported via onError
+      });
+  }
+
+  // Request microphone access once so the permission prompt appears reliably on
+  // tablets and the active input device is initialized. We release the stream
+  // immediately because SpeechRecognition opens its own capture session.
+  async _ensureMicPermission() {
+    if (this._micPrimed) return;
+    if (!navigator.mediaDevices?.getUserMedia) {
+      // Old browser without mediaDevices — let SpeechRecognition prompt itself.
+      this._micPrimed = true;
+      return;
+    }
     try {
-      this.recognition.start();
-    } catch {
-      // already running — ignore
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      stream.getTracks().forEach((t) => t.stop());
+      this._micPrimed = true;
+    } catch (err) {
+      const code =
+        err?.name === 'NotAllowedError' || err?.name === 'SecurityError'
+          ? 'not-allowed'
+          : err?.name === 'NotFoundError'
+          ? 'no-device'
+          : err?.name || 'mic-error';
+      this.onError?.(code);
+      throw err;
     }
   }
 

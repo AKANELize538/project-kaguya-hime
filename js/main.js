@@ -1,10 +1,10 @@
 // ?v= query busts the browser/CDN module cache on each release. Bump it
 // whenever any js/ file changes so tablets fetch the new code immediately
 // instead of serving a stale ES module from cache.
-import { AvatarStage } from './avatar.js?v=2';
-import { SpeechController } from './speech.js?v=2';
-import { Brain } from './brain.js?v=2';
-import { CONFIG } from './config.js?v=2';
+import { AvatarStage } from './avatar.js?v=3';
+import { SpeechController } from './speech.js?v=3';
+import { Brain } from './brain.js?v=3';
+import { CONFIG } from './config.js?v=3';
 
 const stage = new AvatarStage(document.getElementById('stage'));
 const brain = new Brain();

@@ -159,7 +159,11 @@ export class AvatarStage {
     // canvas center — not its top-left — at the given world coordinate.
     model.anchor.set(0.5, 0.5);
     model.x = w / 2;
-    model.y = h / 2;
+    // Nudge down to ~0.6h: the Mao canvas has lots of empty space below the
+    // feet, so true vertical centering leaves the character floating high.
+    // Dropping the anchor pushes that empty box off-screen, not the feet,
+    // and frees the lower band for the mic/settings controls.
+    model.y = h * 0.6;
   }
 
   _drawPlaceholder() {

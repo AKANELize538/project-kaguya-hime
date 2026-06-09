@@ -11,23 +11,23 @@ const brain = new Brain();
 
 const userLine = document.getElementById('user-line');
 const aiLine = document.getElementById('ai-line');
-const micBtn = document.getElementById('mic-btn');
 const langButtons = [...document.querySelectorAll('#lang-switch button')];
 
 let currentLang = CONFIG.defaultLang || 'ja'; // Newrosama speaks Japanese by default
 
 // Always-on mic: after each recognized phrase or silence timeout, listening
-// restarts automatically — no tap needed. While Newrosama is speaking the
-// reply we wait for onSpeakChange(false) before restarting so the mic
-// doesn't pick up her own TTS. micAutoMode is turned off by a manual mic
-// tap or by an unrecoverable error, and back on by tapping the mic again.
+// restarts automatically — there's no mic button. While Newrosama is
+// speaking the reply we wait for onSpeakChange(false) before restarting so
+// the mic doesn't pick up her own TTS. micAutoMode is turned off only by an
+// unrecoverable error (permission/device/network).
 let micAutoMode = true;
+let isListening = false;
 let gotResult = false;
 
 function restartListeningSoon() {
   if (!micAutoMode) return;
   setTimeout(() => {
-    if (!micAutoMode || micBtn.classList.contains('listening')) return;
+    if (!micAutoMode || isListening) return;
     speech.startListening();
   }, 400);
 }
@@ -38,7 +38,7 @@ const speech = new SpeechController({
     handleUserSpeech(text);
   },
   onListenChange: (listening) => {
-    micBtn.classList.toggle('listening', listening);
+    isListening = listening;
     if (!listening) {
       if (gotResult) {
         gotResult = false; // wait for the TTS reply to finish before restarting
@@ -63,8 +63,8 @@ const speech = new SpeechController({
     const msg = messages[err];
     if (msg) userLine.textContent = msg;
     // These errors won't resolve on their own — stop auto-restarting so we
-    // don't spam getUserMedia/recognition in a loop. Tapping the mic button
-    // re-enables auto mode and retries.
+    // don't loop on getUserMedia/recognition. Fix mic permission/connection
+    // and reload the page to try again.
     if (['not-allowed', 'service-not-allowed', 'no-device', 'audio-capture', 'network'].includes(err)) {
       micAutoMode = false;
     }
@@ -77,8 +77,6 @@ speech.setPersona('girl');
 langButtons.forEach((b) => b.classList.toggle('active', b.dataset.lang === currentLang));
 
 if (!speech.supported) {
-  micBtn.disabled = true;
-  micBtn.title = '이 브라우저는 음성 인식을 지원하지 않아요. Chrome이나 Edge를 사용해보세요.';
   aiLine.textContent = 'このブラウザは音声認識に対応していないよ。ChromeかEdgeを使ってね！';
 }
 
@@ -88,17 +86,6 @@ langButtons.forEach((btn) => {
     speech.setLanguage(currentLang);
     langButtons.forEach((b) => b.classList.toggle('active', b === btn));
   });
-});
-
-micBtn.addEventListener('click', () => {
-  if (micBtn.classList.contains('listening')) {
-    micAutoMode = false;
-    speech.stopListening();
-    return;
-  }
-  micAutoMode = true;
-  userLine.textContent = '';
-  speech.startListening();
 });
 
 // Start listening as soon as the page loads — no tap required.

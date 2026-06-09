@@ -148,11 +148,16 @@ export class AvatarStage {
   }
 
   _fitModel(model) {
-    const w = this.app.renderer.width;
-    const h = this.app.renderer.height;
+    // Use the LOGICAL screen size (CSS px), not renderer.width/height which are
+    // physical px (= logical × resolution). On high-DPR devices like the Galaxy
+    // Tab S11 (devicePixelRatio 2) the stage coordinate space is in logical px,
+    // so mixing in physical px scaled the model ~2× and clipped it off-screen.
+    const w = this.app.renderer.screen.width;
+    const h = this.app.renderer.screen.height;
     const origW = model.internalModel?.originalWidth ?? model.width;
     const origH = model.internalModel?.originalHeight ?? model.height;
-    const scale = Math.min((w * 0.9) / origW, (h * 0.95) / origH);
+    // Leave a little headroom so the whole body (incl. broom) fits on screen.
+    const scale = Math.min((w * 0.9) / origW, (h * 0.92) / origH);
     model.scale.set(scale);
     model.x = (w - model.width) / 2;
     model.y = (h - model.height) / 2;
@@ -160,8 +165,9 @@ export class AvatarStage {
 
   _drawPlaceholder() {
     const g = this.placeholder;
-    const w = this.app.renderer.width;
-    const h = this.app.renderer.height;
+    // Logical screen size (CSS px) — see _fitModel for why renderer.width is wrong.
+    const w = this.app.renderer.screen.width;
+    const h = this.app.renderer.screen.height;
     const cx = w / 2;
     const cy = h / 2;
     const t = this._t;
